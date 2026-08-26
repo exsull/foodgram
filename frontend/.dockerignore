@@ -1,0 +1,16 @@
+# Система контроля версий
+.git
+.gitignore
+.gitattributes
+
+node_modules/
+build/
+
+# Файлы Docker (не нужны внутри самого контейнера)
+Dockerfile
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+Dockerfile — working
+Dockerfile — битый
+package-lock — v3.json

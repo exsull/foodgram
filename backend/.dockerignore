@@ -1,0 +1,61 @@
+# Система контроля версий
+.git
+.gitignore
+.gitattributes
+
+# Локальные переменные окружения и секреты
+.env
+.env.*
+!.env.example
+secrets.json
+
+# Документация и медиа-файлы репозитория
+README.md
+LICENSE
+.github/
+media/
+
+# Файлы Docker (не нужны внутри самого контейнера)
+Dockerfile
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Логи и временные файлы
+*.log
+logs/
+tmp/
+.cache/
+.DS_Store
+Thumbs.db
+
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Папки сборки (если сборка идет внутри Docker)
+dist/
+build/
+.next/
+.nuxt/
+.out/
+
+# Тесты и покрытие
+coverage/
+.nyc_output/
+
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+.poetry/
+
+# БД
+db.sqlite3
+db.sqlite3.bak

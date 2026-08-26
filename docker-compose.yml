@@ -1,0 +1,41 @@
+volumes:
+  pg_data:
+  static_volume:
+  media_volume:
+
+services:
+  db:
+    image: postgres:15
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend/
+    env_file: .env
+    depends_on: 
+      - db
+    restart: unless-stopped
+    volumes:
+      - static_volume:/backend_static
+      - media_volume:/app/media
+  frontend:
+    env_file: .env
+    build: ./frontend/
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - static_volume:/frontend_static
+  gateway:
+    build: ./nginx/
+    env_file: .env
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - static_volume:/staticfiles/
+      - media_volume:/media/

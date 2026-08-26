@@ -1,0 +1,5 @@
+# Файлы Docker (не нужны внутри самого контейнера)
+Dockerfile
+Dockerfile*
+docker-compose*.yml
+.dockerignore

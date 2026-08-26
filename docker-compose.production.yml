@@ -1,0 +1,41 @@
+volumes:
+  pg_data_production:
+  static_volume:
+  media_volume:
+
+services:
+  db:
+    image: postgres:15
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - pg_data_production:/var/lib/postgresql/data
+  backend:
+    image: exsull/foodgram_backend
+    env_file: .env
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - static_volume:/backend_static
+      - media_volume:/app/media
+  frontend:
+    image: exsull/foodgram_frontend
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - static_volume:/frontend_static
+  gateway:
+    image: exsull/foodgram_gateway
+    env_file: .env
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    volumes:
+      - static_volume:/staticfiles/
+      - media_volume:/media/
+    ports:
+      - 7000:80
