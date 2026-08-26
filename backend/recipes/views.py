@@ -3,8 +3,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
 from django_filters.rest_framework import DjangoFilterBackend
@@ -13,12 +12,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from foodgram.pagination import LimitPageNumberPagination
 from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, ShortLink, Tag
 from .permissions import IsAuthorOrReadOnly
 from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
 from .utils import generate_short_code
-from foodgram.pagination import LimitPageNumberPagination
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

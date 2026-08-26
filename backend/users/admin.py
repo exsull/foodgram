@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group, User as Usr
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User as Usr
 
 from .models import Subscription, User
-
 
 # Скрываем стандартные Группы Django
 if admin.site.is_registered(Group):

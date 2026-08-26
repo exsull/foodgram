@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
@@ -6,15 +7,14 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
-from djoser.views import UserViewSet as DjoserUserViewSet
 
+from foodgram.pagination import LimitPageNumberPagination
 from .models import Subscription
 from .serializers import (
     AvatarSerializer,
     UserSerializer,
     UserWithRecipesSerializer,
 )
-from foodgram.pagination import LimitPageNumberPagination
 
 User = get_user_model()
 
