@@ -1,20 +1,27 @@
-import django_filters
+from django_filters import rest_framework as filters
 from django.db.models import Exists, OuterRef
+from rest_framework.filters import SearchFilter
 
-from .models import Favorite, Recipe, ShoppingCart
+from .models import Favorite, Recipe, ShoppingCart, Tag
 
 
-class RecipeFilter(django_filters.FilterSet):
-    author = django_filters.NumberFilter(
-        field_name='author__id',
-    )
+class IngredientSearchFilter(SearchFilter):
+    search_param = 'name'
 
-    is_favorited = django_filters.NumberFilter(
+
+class RecipeFilter(filters.FilterSet):
+    is_favorited = filters.BooleanFilter(
         method='filter_is_favorited',
     )
 
-    is_in_shopping_cart = django_filters.NumberFilter(
+    is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart',
+    )
+
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all(),
     )
 
     class Meta:
@@ -23,19 +30,8 @@ class RecipeFilter(django_filters.FilterSet):
             'author',
             'is_favorited',
             'is_in_shopping_cart',
+            'tags',
         )
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-
-        tags = self.request.query_params.getlist('tags')
-
-        if tags:
-            queryset = queryset.filter(
-                tags__slug__in=tags,
-            ).distinct()
-
-        return queryset
 
     def filter_is_favorited(
         self,
@@ -43,27 +39,27 @@ class RecipeFilter(django_filters.FilterSet):
         name,
         value,
     ):
+        if value is None:
+            return queryset
+
         user = self.request.user
 
         if not user.is_authenticated:
-            return queryset.none() if value == 1 else queryset
+            return queryset.none() if value else queryset
 
         favorite_exists = Favorite.objects.filter(
             user=user,
             recipe=OuterRef('pk'),
         )
 
-        if value == 1:
+        if value:
             return queryset.filter(
                 Exists(favorite_exists),
             )
 
-        if value == 0:
-            return queryset.filter(
-                ~Exists(favorite_exists),
-            )
-
-        return queryset
+        return queryset.filter(
+            ~Exists(favorite_exists),
+        )
 
     def filter_is_in_shopping_cart(
         self,
@@ -71,24 +67,24 @@ class RecipeFilter(django_filters.FilterSet):
         name,
         value,
     ):
+        if value is None:
+            return queryset
+
         user = self.request.user
 
         if not user.is_authenticated:
-            return queryset.none() if value == 1 else queryset
+            return queryset.none() if value else queryset
 
         shopping_cart_exists = ShoppingCart.objects.filter(
             user=user,
             recipe=OuterRef('pk'),
         )
 
-        if value == 1:
+        if value:
             return queryset.filter(
                 Exists(shopping_cart_exists),
             )
 
-        if value == 0:
-            return queryset.filter(
-                ~Exists(shopping_cart_exists),
-            )
-
-        return queryset
+        return queryset.filter(
+            ~Exists(shopping_cart_exists),
+        )

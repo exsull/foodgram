@@ -2,12 +2,14 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from recipes.views import ShortLinkRedirectView
+from django.conf import settings
+from django.conf.urls.static import static
+
+from api.views import ShortLinkRedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('djoser.urls.authtoken')),
-    path('api/users/', include('users.urls')),
     path(
         'api/docs/redoc/',
         TemplateView.as_view(
@@ -23,7 +25,7 @@ urlpatterns = [
         ),
         name='openapi-schema',
     ),
-    path('api/', include('recipes.urls')),
+    path('api/', include('api.urls')),
     path(
         's/<str:short_code>/',
         ShortLinkRedirectView.as_view(),
@@ -34,3 +36,13 @@ urlpatterns = [
 admin.site.site_header = 'Панель управления FoodGram'
 admin.site.site_title = 'FoodGram'
 admin.site.index_title = 'Управление проектом'
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.STATIC_URL,
+        document_root=settings.STATIC_ROOT
+    )
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

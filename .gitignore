@@ -1,7 +1,10 @@
 frontend/node_modules
 infra/frontend/build
 .env
-README.bak.md
+
+# Backups
+*.bak
+*.bak.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -64,7 +67,6 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
-db.sqlite3.bak
 db.sqlite3-journal
 
 # Flask stuff:

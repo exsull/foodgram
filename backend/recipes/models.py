@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
-from foodgram import constants
+from . import constants
 
 
 class Tag(models.Model):
@@ -15,7 +16,6 @@ class Tag(models.Model):
         'Slug',
         max_length=constants.TAG_SLUG_MAX_LENGTH,
         unique=True,
-        null=True,
     )
 
     class Meta:
@@ -83,8 +83,13 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Ингредиенты',
     )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        default=timezone.now,
+    )
 
     class Meta:
+        ordering = ['-pub_date']
         verbose_name = 'рецепт'
         verbose_name_plural = 'рецепты'
 

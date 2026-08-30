@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from foodgram import constants
+from . import constants
 
 
 class User(AbstractUser):
@@ -21,13 +21,20 @@ class User(AbstractUser):
     avatar = models.ImageField(
         'Аватар',
         upload_to='users/',
-        null=True,
+        default='',
         blank=True,
+    )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = (
+        'username',
+        'first_name',
+        'last_name',
     )
 
     class Meta:
-        verbose_name = "пользователя"
-        verbose_name_plural = "пользователи"
+        ordering = ['username']
+        verbose_name = 'пользователя'
+        verbose_name_plural = 'пользователи'
 
     def __str__(self):
         return self.username
@@ -53,9 +60,13 @@ class Subscription(models.Model):
                 fields=('user', 'following'),
                 name='unique_subscription',
             ),
+            models.CheckConstraint(
+                condition=~models.Q(following=models.F('user')),
+                name='prevent_self_follow',
+            ),
         ]
-        verbose_name = "подписку"
-        verbose_name_plural = "подписки"
+        verbose_name = 'подписку'
+        verbose_name_plural = 'подписки'
 
     def __str__(self):
         return f'{self.user} -> {self.following}'
