@@ -31,7 +31,6 @@ from recipes.utils import (
     generate_short_code,
 )
 from users.models import Subscription, User
-
 from .serializers import (
     AvatarSerializer,
     IngredientSerializer,

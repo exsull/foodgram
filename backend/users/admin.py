@@ -32,32 +32,32 @@ class UserAdmin(BaseUserAdmin):
     )
     fieldsets = (
         (None, {
-                'fields': (
-                    'username',
-                    'password',
-                ),
-            }),
+            'fields': (
+                'username',
+                'password',
+            ),
+        }),
         ('Личная информация', {
-                'fields': (
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                ),
-            }),
+            'fields': (
+                'first_name',
+                'last_name',
+                'email',
+                'avatar',
+            ),
+        }),
         ('Права доступа', {
-                'fields': (
-                    'is_active',
-                    'is_staff',
-                    'is_superuser',
-                ),
-            }),
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+            ),
+        }),
         ('Важные даты', {
-                "fields": (
-                    'last_login',
-                    'date_joined',
-                ),
-            }),
+            "fields": (
+                'last_login',
+                'date_joined',
+            ),
+        }),
     )
 
     @admin.display(description='Аватар')
