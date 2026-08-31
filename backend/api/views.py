@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import Count, Exists, OuterRef, Sum
+from django.db.models import Count, Exists, OuterRef, Sum, Value
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -15,7 +15,6 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 
 from foodgram.pagination import LimitPageNumberPagination
-from recipes.filters import IngredientSearchFilter, RecipeFilter
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -25,12 +24,13 @@ from recipes.models import (
     ShortLink,
     Tag,
 )
-from recipes.permissions import IsAuthorOrReadOnly
 from recipes.utils import (
     format_shopping_list,
     generate_short_code,
 )
 from users.models import Subscription, User
+from .filters import IngredientSearchFilter, RecipeFilter
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     AvatarSerializer,
     IngredientSerializer,
@@ -276,10 +276,30 @@ class ShortLinkRedirectView(View):
 
 
 class UserViewSet(DjoserUserViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+
+        user = self.request.user
+
+        if user.is_authenticated:
+            return queryset.annotate(
+                is_subscribed=Exists(
+                    Subscription.objects.filter(
+                        user=user,
+                        following=OuterRef('pk'),
+                    )
+                ),
+                recipes_count=Count('recipes'),
+            )
+
+        return queryset.annotate(
+            is_subscribed=Value(False),
+            recipes_count=Count('recipes'),
+        )
 
     def get_permissions(self):
         if self.action in (
@@ -327,11 +347,7 @@ class UserViewSet(DjoserUserViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        author = User.objects.annotate(
-            recipes_count=Count('recipes'),
-        ).get(
-            pk=author.pk,
-        )
+        author = self.get_queryset().get(pk=author.pk)
 
         serializer = UserWithRecipesSerializer(
             author,
@@ -368,10 +384,8 @@ class UserViewSet(DjoserUserViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def subscriptions(self, request):
-        subscriptions = User.objects.filter(
+        subscriptions = self.get_queryset().filter(
             followers__user=request.user,
-        ).annotate(
-            recipes_count=Count('recipes'),
         )
 
         page = self.paginate_queryset(subscriptions)

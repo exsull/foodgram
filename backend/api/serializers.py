@@ -148,9 +148,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и изменения рецепта."""
 
-    image = Base64ImageField(
-        required=False,
-    )
+    image = Base64ImageField()
 
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -179,12 +177,12 @@ class RecipeSerializer(serializers.ModelSerializer):
             'author',
         )
 
-    def validate(self, attrs):
-        if self.instance is None and 'image' not in attrs:
-            raise serializers.ValidationError({
-                'image': 'Изображение обязательно.'
-            })
-        return attrs
+    def validate_image(self, image):
+        if not image:
+            raise serializers.ValidationError(
+                'Изображение обязательно.'
+            )
+        return image
 
     def validate_ingredients(self, ingredients):
         if not ingredients:
@@ -344,7 +342,7 @@ class TokenCreateSerializer(DjoserTCS):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
+    is_subscribed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
@@ -361,16 +359,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'is_subscribed',
         )
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-
-        if request is None or request.user.is_anonymous:
-            return False
-
-        return obj.followers.filter(
-            user=request.user,
-        ).exists()
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

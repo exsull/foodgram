@@ -53,7 +53,7 @@ class UserAdmin(BaseUserAdmin):
             ),
         }),
         ('Важные даты', {
-            "fields": (
+            'fields': (
                 'last_login',
                 'date_joined',
             ),

@@ -2,7 +2,7 @@ from django.db.models import Exists, OuterRef
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 
-from .models import Favorite, Recipe, ShoppingCart, Tag
+from recipes.models import Favorite, Recipe, ShoppingCart, Tag
 
 
 class IngredientSearchFilter(SearchFilter):
