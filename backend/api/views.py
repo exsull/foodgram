@@ -271,7 +271,7 @@ class ShortLinkRedirectView(View):
         )
 
         return redirect(
-            f'{settings.FRONTEND_URL}/recipes/{short_link.recipe.id}/'
+            f'{settings.FRONTEND_URL}/recipes/{short_link.recipe.id}'
         )
 
 
